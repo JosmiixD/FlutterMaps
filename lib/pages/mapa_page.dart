@@ -35,6 +35,8 @@ class _MapaPageState extends State<MapaPage> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           BtnUbicacion(),
+          BtnSeguirUbicacion(),
+          BtnMiRuta(),
         ],
       ),
       body: BlocBuilder<MiUbicacionBloc, MiUbicacionState>(
@@ -49,17 +51,23 @@ class _MapaPageState extends State<MapaPage> {
 
     final mapaBloc = BlocProvider.of<MapaBloc>(context);
 
+    mapaBloc..add( OnNuevaUbicacion( state.ubicacion ));
 
     final cameraPosition = new CameraPosition(
       target: state.ubicacion,
       zoom: 15.0,
     );
+
     return GoogleMap(
       initialCameraPosition: cameraPosition,
       myLocationEnabled: true,
       myLocationButtonEnabled: false,
       zoomControlsEnabled: false,
       onMapCreated: mapaBloc.initMapa,
+      polylines: mapaBloc.state.polylines.values.toSet(),
+      onCameraMove: ( cameraPosition ) {
+        mapaBloc.add( OnMovioMapa(cameraPosition.target) );
+      },
     );
 
   }
